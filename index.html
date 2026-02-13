@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CBT OSN IPA 2026 - SDN 002 Sangatta Utara</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        body { font-family: 'Poppins', sans-serif; }
+        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .soal-grid-btn { transition: all 0.2s; }
+        .soal-grid-btn.answered { background-color: #059669; color: white; border-color: #059669; }
+        .soal-grid-btn.ragu { background-color: #f59e0b; color: white; border-color: #f59e0b; }
+        .soal-grid-btn.current { border: 3px solid #10b981; box-shadow: 0 0 10px rgba(16, 185, 129, 0.5); }
+        .bg-gradient-custom { background: linear-gradient(135deg, #065f46 0%, #10b981 100%); }
+        .img-container { background: #ffffff; border: 2px solid #e5e7eb; border-radius: 16px; padding: 12px; margin-bottom: 20px; text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .img-question { max-height: 280px; object-fit: contain; width: auto; max-width: 100%; border-radius: 8px; margin: 0 auto; }
+        .logo-box { width: 140px; height: 140px; display: flex; align-items: center; justify-content: center; background: white; border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); overflow: hidden; margin: 0 auto; border: 4px solid #f0fdf4; }
+        .option-label:hover { transform: translateX(5px); }
+    </style>
+</head>
+<body class="bg-gradient-custom min-h-screen text-slate-800">
+
+    <div id="app" class="max-w-5xl mx-auto p-4 min-h-screen flex flex-col">
+        
+        <!-- HEADER -->
+        <header class="glass rounded-2xl p-4 mb-6 shadow-xl text-center border-b-4 border-green-600">
+            <h1 class="text-2xl font-bold text-green-800 uppercase tracking-tight">Seleksi OSN IPA 2026</h1>
+            <h2 class="text-lg font-semibold text-green-600">SDN 002 SANGATTA UTARA</h2>
+        </header>
+
+        <!-- SCREEN: LOGIN -->
+        <div id="screen-login" class="glass rounded-3xl p-8 shadow-2xl flex-grow flex flex-col justify-center items-center border border-green-100">
+            <div class="w-full max-w-md text-center">
+                <div class="mb-10">
+                    <div class="logo-box mb-6">
+                        <img id="main-logo" 
+                             src="https://lh3.googleusercontent.com/d/12dwz6quA4sh3dFIE_IxhiVpA1hilT07q" 
+                             onerror="handleLogoError(this)"
+                             alt="Logo SDN 002 Sangatta Utara" 
+                             class="w-full h-full object-contain p-2">
+                    </div>
+                    <p class="text-gray-500 font-medium italic">"Mencetak Generasi Berprestasi dan Berakhlak Mulia"</p>
+                </div>
+
+                <div class="space-y-4 text-left">
+                    <div class="bg-white p-6 rounded-2xl border border-green-50 shadow-sm space-y-4">
+                        <div>
+                            <label class="block text-sm font-bold text-green-700 mb-2">Nama Lengkap Siswa</label>
+                            <input type="text" id="input-nama" class="w-full p-4 border-2 border-green-50 rounded-xl focus:border-green-500 outline-none transition bg-slate-50" placeholder="Masukkan nama sesuai absen...">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-green-700 mb-2">Kelas</label>
+                            <input type="text" id="input-kelas" class="w-full p-4 border-2 border-green-50 rounded-xl focus:border-green-500 outline-none transition bg-slate-50" placeholder="Contoh: VI B">
+                        </div>
+                    </div>
+                    <button onclick="startExam()" class="w-full bg-green-600 hover:bg-green-700 text-white font-black py-5 rounded-2xl shadow-lg transition transform hover:-translate-y-1 active:scale-95 text-lg tracking-wide uppercase">
+                        MULAI UJIAN SEKARANG <i class="fas fa-rocket ml-2"></i>
+                    </button>
+                    <button onclick="showAdminPanel()" class="w-full text-gray-400 text-[10px] mt-6 hover:underline uppercase tracking-[0.2em]">Panel Guru</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN: EXAM -->
+        <div id="screen-exam" class="hidden flex-grow flex flex-col animate-fadeIn">
+            <div class="flex flex-col lg:flex-row gap-6 flex-grow">
+                <!-- Question Area -->
+                <div class="flex-grow glass rounded-3xl p-6 shadow-xl relative pb-28 border border-green-50">
+                    <div class="flex justify-between items-center mb-8 bg-white/50 p-3 rounded-2xl border border-white">
+                        <span class="bg-green-600 text-white px-6 py-2 rounded-xl font-black shadow-md flex items-center">
+                            <span class="opacity-70 text-xs mr-2 uppercase">SOAL</span>
+                            <span id="current-number" class="text-xl">1</span>
+                        </span>
+                        <div id="timer-display" class="flex items-center gap-3">
+                            <i class="far fa-clock text-red-500 text-xl animate-pulse"></i>
+                            <div class="text-red-600 font-mono font-black text-2xl" id="timer-countdown">60:00</div>
+                        </div>
+                    </div>
+
+                    <div id="question-container" class="space-y-4 overflow-y-auto max-h-[60vh] pr-4 custom-scrollbar">
+                        <!-- Content Injected via JS -->
+                    </div>
+
+                    <!-- Navigation Footer -->
+                    <div class="absolute bottom-6 left-6 right-6 flex items-center justify-between gap-4 border-t border-green-100 pt-6 bg-white/30 backdrop-blur-sm rounded-b-3xl">
+                        <button onclick="prevQuestion()" id="btn-prev" class="px-6 py-3 bg-white text-gray-600 rounded-2xl font-bold hover:bg-gray-100 disabled:opacity-30 border-2 border-gray-100 transition shadow-sm">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button onclick="toggleRagu()" id="btn-ragu" class="flex-grow lg:flex-none px-10 py-3 bg-yellow-400 text-white rounded-2xl font-bold hover:bg-yellow-500 transition shadow-lg shadow-yellow-100">
+                            <i class="far fa-flag mr-2"></i> RAGU-RAGU
+                        </button>
+                        <button onclick="nextQuestion()" id="btn-next" class="px-6 py-3 bg-green-600 text-white rounded-2xl font-bold hover:bg-green-700 transition shadow-lg shadow-green-100">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <button onclick="showConfirmFinish()" id="btn-finish" class="hidden px-10 py-3 bg-blue-600 text-white rounded-2xl font-black hover:bg-blue-700 shadow-xl transition animate-bounce">
+                            SELESAI & KIRIM <i class="fas fa-paper-plane ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Navigation Grid Sidebar -->
+                <div class="w-full lg:w-72 glass rounded-3xl p-6 shadow-xl border border-green-50 h-fit lg:sticky lg:top-4">
+                    <div class="flex items-center justify-between mb-6 border-b border-green-100 pb-3">
+                        <h3 class="font-black text-green-800 uppercase tracking-wider text-sm">Status Jawaban</h3>
+                        <span class="text-[10px] bg-green-100 text-green-700 px-3 py-1 rounded-full font-bold">50 Soal</span>
+                    </div>
+                    <div id="soal-grid" class="grid grid-cols-5 gap-3 max-h-[400px] lg:max-h-none overflow-y-auto p-1 custom-scrollbar">
+                        <!-- Grid generated via JS -->
+                    </div>
+                    <div class="mt-6 space-y-2 pt-4 border-t border-green-50">
+                        <div class="flex items-center text-[10px] font-bold text-gray-500">
+                            <div class="w-3 h-3 bg-green-600 rounded-sm mr-2"></div> SUDAH DIJAWAB
+                        </div>
+                        <div class="flex items-center text-[10px] font-bold text-gray-500">
+                            <div class="w-3 h-3 bg-yellow-400 rounded-sm mr-2"></div> RAGU-RAGU
+                        </div>
+                        <div class="flex items-center text-[10px] font-bold text-gray-500">
+                            <div class="w-3 h-3 bg-white border-2 border-gray-200 rounded-sm mr-2"></div> BELUM DIJAWAB
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN: RESULT -->
+        <div id="screen-result" class="hidden glass rounded-[40px] p-12 shadow-2xl flex-grow flex flex-col justify-center items-center text-center">
+             <div class="w-32 h-32 bg-green-100 rounded-full flex items-center justify-center text-green-600 text-6xl mb-8 shadow-inner">
+                <i class="fas fa-award"></i>
+             </div>
+             <h2 class="text-4xl font-black text-green-800 mb-2">Luar Biasa!</h2>
+             <p id="result-info" class="text-xl text-gray-600 mb-8 font-medium"></p>
+             <div class="bg-white p-12 rounded-[40px] shadow-2xl border-4 border-green-50 mb-10 relative overflow-hidden">
+                 <div class="absolute top-0 left-0 w-full h-2 bg-green-500"></div>
+                 <p class="text-gray-400 font-black text-sm uppercase tracking-widest mb-2">Skor Ujian Anda</p>
+                 <div id="result-score" class="text-9xl font-black text-green-600 tracking-tighter">0</div>
+             </div>
+             <button onclick="location.reload()" class="px-14 py-5 bg-green-600 text-white rounded-3xl font-black hover:bg-green-700 transition transform hover:scale-105 shadow-xl shadow-green-200">
+                KEMBALI KE BERANDA
+             </button>
+        </div>
+
+        <!-- SCREEN: ADMIN -->
+        <div id="screen-admin" class="hidden glass rounded-3xl p-8 shadow-2xl flex-grow flex flex-col">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-black text-slate-800">Daftar Hasil Nilai</h2>
+                <button onclick="showLogin()" class="bg-slate-100 text-slate-600 px-6 py-3 rounded-2xl font-bold hover:bg-slate-200 transition">Tutup Panel</button>
+            </div>
+            <div class="flex-grow overflow-hidden rounded-3xl border-2 border-slate-100 bg-white shadow-sm">
+                <div class="overflow-y-auto h-full">
+                    <table class="w-full text-left">
+                        <thead class="sticky top-0 bg-slate-800 text-white z-10">
+                            <tr>
+                                <th class="p-5 font-black uppercase text-xs tracking-widest">Nama Siswa</th>
+                                <th class="p-5 font-black uppercase text-xs tracking-widest">Kelas</th>
+                                <th class="p-5 font-black uppercase text-xs tracking-widest text-center">Skor Akhir</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-table-body" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                    <div id="admin-empty" class="p-20 text-center text-gray-400 italic font-medium">Belum ada siswa yang menyelesaikan ujian.</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MODAL CONFIRM -->
+    <div id="modal-confirm" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-6">
+        <div class="bg-white p-10 rounded-[40px] max-w-sm w-full text-center shadow-2xl transform transition-all border-b-8 border-blue-600">
+            <div class="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+                <i class="fas fa-question"></i>
+            </div>
+            <h3 class="text-2xl font-black mb-3 text-slate-800">Kirim Sekarang?</h3>
+            <p class="text-gray-500 mb-10 text-sm leading-relaxed">Sistem akan mengoreksi jawaban Anda secara otomatis. Pastikan semua sudah benar.</p>
+            <div class="grid grid-cols-2 gap-4">
+                <button onclick="hideConfirmFinish()" class="py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200 transition">BATAL</button>
+                <button onclick="submitExam()" class="py-4 bg-blue-600 text-white rounded-2xl font-black hover:bg-blue-700 transition shadow-xl shadow-blue-200">YA, KIRIM</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data Soal Lengkap dari Bank Soal IPA Kelas 6 SD 2.docx
+        const questions = [
+            // BAGIAN 1: PILIHAN GANDA (10 Soal)
+            { 
+                type: 'mc', 
+                q: "Jika populasi katak di sebuah sawah menurun drastis akibat perburuan manusia, dampak jangka panjang yang paling mungkin terjadi pada ekosistem tersebut adalah...", 
+                image: "https://lh3.googleusercontent.com/d/1lWVqJj45W1CqfSKWIzmG_PqrY7MZlz2b",
+                options: [
+                    "Populasi belalang menurun karena jumlah ular meningkat", 
+                    "Populasi rumput meningkat karena jumlah belalang berkurang", 
+                    "Populasi ular menurun drastis sehingga populasi elang terancam", 
+                    "Populasi belalang meningkat drastis sehingga merusak tanaman padi"
+                ], 
+                correct: 3 
+            },
+            { 
+                type: 'mc', 
+                q: "Penyu laut merupakan hewan yang siklus hidupnya dimulai dari telur di pantai hingga dewasa di samudera. Mengingat banyaknya predator di pantai, upaya pelestarian yang paling tepat untuk mengaitkan siklus hidup penyu dengan keberhasilannya mencapai usia dewasa adalah...", 
+                options: [
+                    "Melarang nelayan menangkap ikan di seluruh area laut", 
+                    "Memindahkan telur ke tempat penetasan semi-alami (penangkaran) lalu melepas tukik secara bersamaan", 
+                    "Memberi makan tukik (anak penyu) di laut lepas agar cepat besar", 
+                    "Memagari seluruh pantai agar tidak ada hewan lain yang masuk"
+                ], 
+                correct: 1 
+            },
+            { 
+                type: 'mc', 
+                q: "Berdasarkan tabel di bawah ini, hubungan antara bentuk tubuh dan fungsi adaptasi yang benar adalah...", 
+                image: "https://lh3.googleusercontent.com/d/1s0yYlslVgqPB484Urzjo2cz2sOMUDZgC",
+                options: [
+                    "Kaktus berdaun duri untuk mempercepat penguapan", 
+                    "Teratai berdaun lebar untuk menyerap oksigen lebih banyak dari air", 
+                    "Kantong semar menghasilkan nektar untuk memerangkap serangga sebagai sumber nitrogen", 
+                    "Kaktus berdaun duri untuk menyimpan cadangan makanan"
+                ], 
+                correct: 2 
+            },
+            { 
+                type: 'mc', 
+                q: "Perhatikan gambar di bawah ini. Jika sebuah magnet dipotong menjadi dua bagian, maka masing-masing potongan tersebut akan...", 
+                image: "https://lh3.googleusercontent.com/d/1IQYa2odiREL7E5O2KqgnV4X-cPaE3lbB",
+                options: [
+                    "Memiliki satu kutub saja (Utara atau Selatan)", 
+                    "Tetap memiliki dua kutub (Utara dan Selatan)", 
+                    "Kehilangan sifat kemagnetannya sama sekali", 
+                    "Menjadi kutub utara di kedua ujungnya"
+                ], 
+                correct: 1 
+            },
+            { 
+                type: 'mc', 
+                q: "Peristiwa yang menunjukkan pemuaian benda akibat panas dalam kehidupan sehari-hari adalah...", 
+                options: [
+                    "Pemasangan kabel listrik dibuat kendur agar tidak putus saat menyusut di malam hari", 
+                    "Gelas pecah saat diisi air es karena suhu yang terlalu dingin", 
+                    "Rel kereta api dipasang rapat tanpa celah agar kereta tidak anjlok", 
+                    "Ban sepeda yang kempes saat diparkir di tempat yang panas"
+                ], 
+                correct: 0 
+            },
+            { 
+                type: 'mc', 
+                q: "Perhatikan anatomi organ berikut. Bagian telinga yang berfungsi untuk menangkap getaran suara dan meneruskannya ke tulang-tulang pendengaran ditunjukkan oleh nomor...", 
+                image: "https://lh3.googleusercontent.com/d/1DTD0t0m4np6qCH_734d7_l6DzzhLd8yF",
+                options: [
+                    "Saluran eustachius", 
+                    "Daun telinga", 
+                    "Gendang telinga (membran timpani)", 
+                    "Saluran setengah lingkaran"
+                ], 
+                correct: 2 
+            },
+            { 
+                type: 'mc', 
+                q: "Benda-benda yang dapat ditarik dengan sangat kuat oleh magnet, seperti besi dan baja, disebut sebagai kelompok benda...", 
+                options: ["Diamagnetik", "Paramagnetik", "Feromagnetik", "Isomagnetik"], 
+                correct: 2 
+            },
+            { 
+                type: 'mc', 
+                q: "Fungsi utama akar pada tumbuhan yang paling mendasar bagi keberlangsungan hidupnya adalah...", 
+                options: [
+                    "Tempat terjadinya proses fotosintesis", 
+                    "Menyerap air dan unsur hara dari dalam tanah", 
+                    "Sebagai alat perkembangbiakan generatif", 
+                    "Tempat menyimpan cadangan makanan berupa oksigen"
+                ], 
+                correct: 1 
+            },
+            { 
+                type: 'mc', 
+                q: "Kelompok hewan di bawah ini yang semuanya bernapas menggunakan paru-paru adalah...", 
+                options: [
+                    "Ikan mas, Kecebong, dan Paus", 
+                    "Lumba-lumba, Sapi, dan Burung Merpati", 
+                    "Cacing tanah, Belalang, dan Kuda", 
+                    "Ikan Pari, Hiu, dan Penyu"
+                ], 
+                correct: 1 
+            },
+            { 
+                type: 'mc', 
+                q: "Planet dalam tata surya yang dijuluki sebagai 'Planet Merah' karena kandungan besi oksida di permukaannya adalah...", 
+                options: ["Venus", "Mars", "Jupiter", "Saturnus"], 
+                correct: 1 
+            },
+
+            // BAGIAN 2: PILIHAN GANDA KOMPLEKS (10 Soal)
+            { 
+                type: 'mr', 
+                q: "Manakah di antara zat berikut yang merupakan contoh zat tunggal? (Pilih semua yang benar)", 
+                options: ["Emas Murni (24 Karat)", "Air Gula", "Garam Dapur (NaCl)", "Sirup Buah"], 
+                correct: [0, 2] 
+            },
+            { 
+                type: 'mr', 
+                q: "Apa saja bukti bahwa bunyi dapat dipantulkan? (Pilih semua yang benar)", 
+                options: ["Terdengarnya gema saat berteriak di tebing", "Terjadinya gaung di dalam gedung kosong", "Bunyi dapat merambat melalui air", "Bunyi tidak terdengar di ruang hampa"], 
+                correct: [0, 1] 
+            },
+            { 
+                type: 'mr', 
+                q: "Benda-benda berikut yang termasuk konduktor panas yang baik adalah... (Pilih semua yang benar)", 
+                options: ["Sendok Stainless Steel", "Wajan Alumunium", "Gagang sodet dari plastik", "Kain lap dapur"], 
+                correct: [0, 1] 
+            },
+            { 
+                type: 'mr', 
+                q: "Manakah yang merupakan ciri-ciri fisik masa pubertas pada remaja laki-laki? (Pilih semua yang benar)", 
+                options: ["Suara menjadi lebih berat dan besar", "Pinggul melebar", "Tumbuhnya jakun", "Mengalami siklus menstruasi"], 
+                correct: [0, 2] 
+            },
+            { 
+                type: 'mr', 
+                q: "Kelompok benda yang dapat ditembus oleh cahaya adalah... (Pilih semua yang benar)", 
+                options: ["Kaca bening", "Plastik bening", "Papan kayu tebal", "Tembok beton"], 
+                correct: [0, 1] 
+            },
+            { 
+                type: 'mr', 
+                q: "Manakah yang termasuk sumber energi terbarukan (energi alternatif)? (Pilih semua yang benar)", 
+                options: ["Matahari (Surya)", "Angin", "Batu Bara", "Minyak Bumi"], 
+                correct: [0, 1] 
+            },
+            { 
+                type: 'mr', 
+                q: "Apa saja fungsi darah bagi tubuh manusia? (Pilih semua yang benar)", 
+                options: ["Mengangkut oksigen ke seluruh tubuh", "Menghasilkan energi gerak", "Mengedarkan sari-sari makanan", "Tempat terjadinya pencernaan protein"], 
+                correct: [0, 2] 
+            },
+            { 
+                type: 'mr', 
+                q: "Tumbuhan yang menyimpan cadangan makanannya di dalam umbi adalah... (Pilih semua yang benar)", 
+                options: ["Singkong", "Padi", "Kentang", "Jagung"], 
+                correct: [0, 2] 
+            },
+            { 
+                type: 'mr', 
+                q: "Contoh peristiwa perubahan wujud menyublim dalam kehidupan sehari-hari adalah... (Pilih semua yang benar)", 
+                options: ["Kapur barus di lemari yang lama-lama mengecil", "Es batu yang diletakkan di ruang terbuka", "Pembentukan kristal es (salju) dari uap air", "Air yang mendidih menjadi uap"], 
+                correct: [0, 2] 
+            },
+            { 
+                type: 'mr', 
+                q: "Cara-cara perpindahan panas yang terjadi di alam adalah... (Pilih semua yang benar)", 
+                options: ["Konduksi", "Konveksi", "Induksi", "Radiasi"], 
+                correct: [0, 1, 3] 
+            },
+
+            // BAGIAN 3: BENAR/SALAH (30 Soal)
+            { type: 'tf', q: "Matahari adalah pusat tata surya karena semua planet dan benda langit lainnya berputar mengelilinginya akibat gaya gravitasi Matahari.", correct: true },
+            { type: 'tf', q: "Sendok logam yang terasa panas saat dimasukkan ke dalam kopi panas adalah contoh perpindahan panas secara konveksi.", correct: false },
+            { type: 'tf', q: "Emas murni dan garam dapur merupakan contoh zat tunggal karena terdiri dari materi yang sejenis.", correct: true },
+            { type: 'tf', q: "Buah apel yang jatuh dari pohon ke bawah disebabkan oleh adanya gaya magnet bumi.", correct: false },
+            { type: 'tf', q: "Tumbuhnya kumis dan dada menjadi lebih bidang adalah ciri perkembangan sekunder pada remaja laki-laki di masa pubertas.", correct: true },
+            { type: 'tf', q: "Dalam sebuah jaring-jaring makanan, jamur dan bakteri berperan sebagai produsen yang menghasilkan makanan sendiri.", correct: false },
+            { type: 'tf', q: "Bunyi dapat merambat di ruang hampa udara (vakum) seperti di luar angkasa dengan sangat cepat.", correct: false },
+            { type: 'tf', q: "Penyakit osteoporosis adalah kondisi di mana tulang menjadi rapuh karena kekurangan kalsium, yang dapat dicegah dengan mengonsumsi susu.", correct: true },
+            { type: 'tf', q: "Hujan asam adalah fenomena alam normal yang membantu menyuburkan tanah dan menjaga kebersihan air sungai.", correct: false },
+            { type: 'tf', q: "Pelestarian hewan langka yang dilakukan di habitat aslinya (seperti Taman Nasional Komodo) disebut pelestarian In-situ.", correct: true },
+            { type: 'tf', q: "Bahan kimia berlebihan dalam detergen dapat menyebabkan pencemaran air dan mengganggu kehidupan organisme di sungai.", correct: true },
+            { type: 'tf', q: "Energi listrik dapat diubah menjadi energi gerak, contohnya pada kipas angin dan mesin cuci.", correct: true },
+            { type: 'tf', q: "Proses fotosintesis pada tumbuhan hijau terutama terjadi pada malam hari ketika tumbuhan beristirahat.", correct: false },
+            { type: 'tf', q: "Semua jenis logam akan mengalami pemuaian (bertambah panjang/luas) jika suhunya dinaikkan atau dipanaskan.", correct: true },
+            { type: 'tf', q: "Penguapan air laut oleh panas Matahari merupakan tahap awal dalam proses siklus air di Bumi.", correct: true },
+            { type: 'tf', q: "Gaya gesek selalu merugikan karena menghambat gerak benda, sehingga harus selalu dihilangkan sepenuhnya.", correct: false },
+            { type: 'tf', q: "Penderita rabun jauh (miopi) dapat dibantu dengan menggunakan kacamata berlensa cembung.", correct: false },
+            { type: 'tf', q: "Gerakan Bumi berputar pada porosnya (rotasi) mengakibatkan terjadinya pergantian musim di berbagai belahan dunia.", correct: false },
+            { type: 'tf', q: "Hewan yang berkembang biak dengan cara melahirkan anak disebut hewan vivipar.", correct: true },
+            { type: 'tf', q: "Tumbuhan memerlukan gas karbon dioksida dari udara untuk melakukan proses fotosintesis.", correct: true },
+            { type: 'tf', q: "Rangka manusia berfungsi untuk melindungi organ dalam yang vital seperti jantung dan paru-paru.", correct: true },
+            { type: 'tf', q: "Gigi geraham pada manusia berfungsi khusus untuk memotong makanan yang teksturnya keras.", correct: false },
+            { type: 'tf', q: "Vitamin C sangat berperan dalam menjaga kesehatan gusi dan mencegah sariawan.", correct: true },
+            { type: 'tf', q: "Planet Jupiter merupakan planet terkecil di dalam sistem tata surya kita.", correct: false },
+            { type: 'tf', q: "Pelangi terbentuk karena adanya proses pembiasan dan penguraian cahaya Matahari oleh titik-titik air hujan.", correct: true },
+            { type: 'tf', q: "Baterai dan aki adalah contoh sumber energi listrik yang mengubah energi kimia menjadi energi listrik.", correct: true },
+            { type: 'tf', q: "Tumbuhan jati menggugurkan daunnya pada musim kemarau bertujuan untuk mempercepat penguapan air.", correct: false },
+            { type: 'tf', q: "Simbiosis parasitisme adalah hubungan dua makhluk hidup di mana satu pihak untung dan pihak lain dirugikan.", correct: true },
+            { type: 'tf', q: "Bagian darah yang berfungsi untuk membekukan darah saat terjadi luka adalah sel darah merah.", correct: false },
+            { type: 'tf', q: "Magnet memiliki dua kutub, yaitu kutub Utara dan kutub Selatan.", correct: true }
+        ];
+
+        let currentUser = { nama: "", kelas: "" };
+        let currentIdx = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let userRagu = new Array(questions.length).fill(false);
+        let results = [];
+        let timerSeconds = 60 * 60;
+        let timerInterval;
+
+        function handleLogoError(img) {
+            img.parentElement.innerHTML = '<div class="text-green-600 font-bold text-center"><i class="fas fa-graduation-cap text-5xl mb-2"></i><br><span class="text-[10px]">LOGO SDN 002</span></div>';
+        }
+
+        function startExam() {
+            const nama = document.getElementById('input-nama').value.trim();
+            const kelas = document.getElementById('input-kelas').value.trim();
+            if (!nama || !kelas) { alert("Harap isi Nama dan Kelas terlebih dahulu!"); return; }
+            currentUser = { nama, kelas };
+            document.getElementById('screen-login').classList.add('hidden');
+            document.getElementById('screen-exam').classList.remove('hidden');
+            startTimer();
+            renderGrid();
+            showQuestion(0);
+        }
+
+        function startTimer() {
+            const timerEl = document.getElementById('timer-countdown');
+            timerInterval = setInterval(() => {
+                timerSeconds--;
+                if (timerSeconds <= 0) { clearInterval(timerInterval); submitExam(); }
+                let mins = Math.floor(timerSeconds / 60);
+                let secs = timerSeconds % 60;
+                timerEl.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        function renderGrid() {
+            const grid = document.getElementById('soal-grid');
+            grid.innerHTML = "";
+            questions.forEach((_, i) => {
+                const btn = document.createElement('button');
+                btn.className = `soal-grid-btn w-full aspect-square rounded-xl text-xs font-black border-2 shadow-sm ${getGridStatusClass(i)}`;
+                btn.innerText = i + 1;
+                btn.onclick = () => showQuestion(i);
+                grid.appendChild(btn);
+            });
+        }
+
+        function getGridStatusClass(i) {
+            let classes = "";
+            if (i === currentIdx) classes += " current";
+            if (userRagu[i]) return classes + " ragu";
+            const ans = userAnswers[i];
+            if (ans !== null && (Array.isArray(ans) ? ans.length > 0 : true)) return classes + " answered";
+            return classes + " bg-white text-slate-300 border-slate-100";
+        }
+
+        function showQuestion(idx) {
+            currentIdx = idx;
+            const q = questions[idx];
+            document.getElementById('current-number').innerText = idx + 1;
+            
+            let html = ``;
+            if (q.image) {
+                html += `<div class="img-container">
+                    <img src="${q.image}" onerror="this.parentElement.style.display='none'" class="img-question">
+                    <p class="text-[10px] text-gray-400 mt-2 italic">Gambar Penunjang Soal</p>
+                </div>`;
+            }
+
+            html += `<p class="text-xl font-bold text-slate-800 leading-relaxed mb-8">${q.q}</p>`;
+            
+            if (q.type === 'mr') {
+                html += `<div class="mb-6 flex items-center bg-blue-50 text-blue-700 text-[10px] font-black px-4 py-2 rounded-full w-fit uppercase tracking-widest border border-blue-100">
+                    <i class="fas fa-info-circle mr-2"></i> Pilih lebih dari satu jawaban yang benar
+                </div>`;
+            }
+
+            html += `<div class="grid gap-4">`;
+            if (q.type === 'mc') {
+                q.options.forEach((opt, i) => {
+                    const isChecked = userAnswers[idx] === i;
+                    html += `<label class="option-label flex items-center p-5 border-2 rounded-[24px] cursor-pointer transition-all ${isChecked ? 'border-green-600 bg-green-50 shadow-md translate-x-2' : 'border-slate-50 hover:border-green-200 bg-white shadow-sm'}" onclick="saveAnswer(${idx}, ${i})">
+                        <div class="w-10 h-10 flex items-center justify-center rounded-full border-2 mr-5 font-black text-lg transition-colors ${isChecked ? 'bg-green-600 border-green-600 text-white' : 'border-slate-200 text-slate-400'}">${String.fromCharCode(65+i)}</div>
+                        <span class="text-lg ${isChecked ? 'text-green-900 font-bold' : 'text-slate-600'}">${opt}</span>
+                    </label>`;
+                });
+            } else if (q.type === 'mr') {
+                q.options.forEach((opt, i) => {
+                    const isChecked = Array.isArray(userAnswers[idx]) && userAnswers[idx].includes(i);
+                    html += `<label class="option-label flex items-center p-5 border-2 rounded-[24px] cursor-pointer transition-all ${isChecked ? 'border-blue-600 bg-blue-50 shadow-md translate-x-2' : 'border-slate-50 hover:border-blue-200 bg-white shadow-sm'}" onclick="saveAnswerMR(${idx}, ${i}, event)">
+                        <div class="w-8 h-8 flex items-center justify-center rounded-xl border-2 mr-5 ${isChecked ? 'bg-blue-600 border-blue-600 text-white' : 'border-slate-200'}">
+                            ${isChecked ? '<i class="fas fa-check text-sm"></i>' : ''}
+                        </div>
+                        <span class="text-lg ${isChecked ? 'text-blue-900 font-bold' : 'text-slate-600'}">${opt}</span>
+                    </label>`;
+                });
+            } else if (q.type === 'tf') {
+                html += `
+                <div class="flex flex-col md:flex-row gap-6 mt-4">
+                    <button onclick="saveAnswer(${idx}, true)" class="flex-1 p-8 border-4 rounded-[40px] font-black text-2xl transition-all flex flex-col items-center justify-center gap-2 ${userAnswers[idx] === true ? 'border-green-600 bg-green-600 text-white shadow-2xl scale-105' : 'border-slate-50 bg-white text-slate-300 hover:border-green-100'}">
+                        <i class="fas fa-check-circle text-4xl mb-2"></i> SESUAI
+                    </button>
+                    <button onclick="saveAnswer(${idx}, false)" class="flex-1 p-8 border-4 rounded-[40px] font-black text-2xl transition-all flex flex-col items-center justify-center gap-2 ${userAnswers[idx] === false ? 'border-red-600 bg-red-600 text-white shadow-2xl scale-105' : 'border-slate-50 bg-white text-slate-300 hover:border-red-100'}">
+                        <i class="fas fa-times-circle text-4xl mb-2"></i> TIDAK SESUAI
+                    </button>
+                </div>`;
+            }
+            html += `</div>`;
+            document.getElementById('question-container').innerHTML = html;
+            
+            document.getElementById('btn-prev').disabled = idx === 0;
+            const isLast = idx === questions.length - 1;
+            document.getElementById('btn-next').classList.toggle('hidden', isLast);
+            document.getElementById('btn-finish').classList.toggle('hidden', !isLast);
+            renderGrid();
+        }
+
+        function saveAnswer(idx, val) { userAnswers[idx] = val; showQuestion(idx); }
+        function saveAnswerMR(idx, val, e) {
+            e.preventDefault();
+            if (!Array.isArray(userAnswers[idx])) userAnswers[idx] = [];
+            const pos = userAnswers[idx].indexOf(val);
+            if (pos === -1) userAnswers[idx].push(val); else userAnswers[idx].splice(pos, 1);
+            showQuestion(idx);
+        }
+        function toggleRagu() { userRagu[currentIdx] = !userRagu[currentIdx]; renderGrid(); }
+        function nextQuestion() { if (currentIdx < questions.length - 1) showQuestion(currentIdx + 1); }
+        function prevQuestion() { if (currentIdx > 0) showQuestion(currentIdx - 1); }
+        function showConfirmFinish() { document.getElementById('modal-confirm').classList.remove('hidden'); }
+        function hideConfirmFinish() { document.getElementById('modal-confirm').classList.add('hidden'); }
+
+        function submitExam() {
+            clearInterval(timerInterval);
+            let score = 0;
+            questions.forEach((q, i) => {
+                const ans = userAnswers[i];
+                if ((q.type === 'mc' || q.type === 'tf') && ans === q.correct) score++;
+                else if (q.type === 'mr' && Array.isArray(ans)) {
+                    if (ans.length === q.correct.length && ans.every(v => q.correct.includes(v))) score++;
+                }
+            });
+            const finalScore = Math.round((score / questions.length) * 100);
+            results.push({ nama: currentUser.nama, kelas: currentUser.kelas, skor: finalScore });
+            
+            document.getElementById('modal-confirm').classList.add('hidden');
+            document.getElementById('screen-exam').classList.add('hidden');
+            document.getElementById('screen-result').classList.remove('hidden');
+            document.getElementById('result-score').innerText = finalScore;
+            document.getElementById('result-info').innerText = `${currentUser.nama} | KELAS ${currentUser.kelas}`;
+        }
+
+        function showAdminPanel() {
+            const p = prompt("Masukkan Kata Sandi Guru:");
+            if (p === "1995") {
+                document.getElementById('screen-login').classList.add('hidden');
+                document.getElementById('screen-admin').classList.remove('hidden');
+                const tbody = document.getElementById('admin-table-body');
+                if (results.length > 0) {
+                    document.getElementById('admin-empty').classList.add('hidden');
+                    tbody.innerHTML = results.map(r => `
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="p-5 font-bold text-slate-800">${r.nama}</td>
+                            <td class="p-5 text-slate-500">${r.kelas}</td>
+                            <td class="p-5 text-center font-black text-green-600 text-xl">${r.skor}</td>
+                        </tr>
+                    `).join('');
+                }
+            } else if (p !== null) { alert("Sandi salah!"); }
+        }
+        function showLogin() { location.reload(); }
+    </script>
+</body>
+</html>
